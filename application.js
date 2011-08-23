@@ -25,7 +25,12 @@ App.Router = Backbone.Router.extend({
   // },
 
   show: function(id) {
-  }
+    new Gist({ id: id }).fetch({
+      success: function(model) {
+        new App.Views.Gist({ model: model }).render();
+      },
+    });
+  },
 });
 
 App.Views = {
@@ -55,18 +60,32 @@ App.Views = {
   GistSummary: Backbone.View.extend({
     tagName: "li",
 
-    initialize: function() {
-      this.model.bind('change', this.render);
+    render: function() {
+      $(this.el).html(Milk.render('<a href="/gist/{{id}}">{{description}}</a>', this.model));
+      return this.el;
+    },
+  }),
+
+  Gist: Backbone.View.extend({
+    initialize: function(options) {
+      $('#content').html(this.el);
     },
 
     render: function() {
-      $(this.el).html(Milk.render('<a href="/gist/{{id}}">{{description}}</a>', this.model));
+      var el = this.el;
+      $(el).html(Milk.render($('#gist-template').html(), this.model));
+
+      _.values(this.model.get('files')).forEach(function(file) {
+        $(el).append(Milk.render($('#file-template').html(), file));
+      });
+
       return this.el;
     },
   }),
 };
 
 Gist = Backbone.Model.extend({
+  urlRoot: 'https://api.github.com/gists',
   description: function() {
     return this.get('description') || 'Gist #' + this.id;
   },
