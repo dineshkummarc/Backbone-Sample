@@ -1,12 +1,13 @@
 App = function() {
-  App.Router.PageView = new App.Views.Page();
   new App.Router().bind('route', function() {
     $('#content').html('');
-    App.periodic && clearInterval(App.periodic);
   });
 
   Backbone.history.start({ pushState: true });
 };
+
+var view;
+setInterval(function() { view.periodic && view.periodic() }, 5000)
 
 App.Router = Backbone.Router.extend({
   routes: {
@@ -16,31 +17,28 @@ App.Router = Backbone.Router.extend({
   },
 
   initialize: function() {
+    App.Router.PageView = new App.Views.Page();
+    App.Router.ListView = new App.Views.List();
+    App.Router.GistView = new App.Views.Gist();
   },
 
   index: function() {
-    var view = new App.Views.List();
-    view.collection = new Gists();
-    view.collection.bind('reset', view.render, view);
-    view.collection.fetch();
+    view = App.Router.ListView;
     $('#content').html(view.el);
 
-    App.periodic = function() { view.collection.fetch() };
-    setInterval(App.periodic, 5000);
+    view.collection.fetch();
   },
 
   // new: function() {
   // },
 
   show: function(id) {
-    var view = new App.Views.Gist();
-    view.model = new Gist({ id: id });
-    view.model.bind('change', view.render, view);
-    view.model.fetch();
+    view = App.Router.GistView;
+    $(view.el).empty();
     $('#content').html(view.el);
 
-    App.periodic = function() { view.model.fetch() };
-    setInterval(App.periodic, 5000);
+    view.model.id = id;
+    view.model.fetch();
   },
 });
 
@@ -58,6 +56,15 @@ App.Views = {
   List: Backbone.View.extend({
     tagName: "ul",
 
+    initialize: function() {
+      this.collection = new Gists();
+      this.collection.bind('reset', this.render, this);
+    },
+
+    periodic: function() {
+      this.collection.fetch();
+    },
+
     render: function() {
       var el = this.el;
       $(el).empty();
@@ -67,7 +74,7 @@ App.Views = {
       });
 
       return this.el;
-    }
+    },
   }),
 
   GistSummary: Backbone.View.extend({
@@ -80,6 +87,15 @@ App.Views = {
   }),
 
   Gist: Backbone.View.extend({
+    initialize: function() {
+      this.model = new Gist();
+      this.model.bind('change', this.render, this);
+    },
+
+    periodic: function() {
+      this.model.fetch();
+    },
+
     render: function() {
       var el = this.el;
 
