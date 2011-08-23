@@ -1,8 +1,10 @@
 App = function() {
+  App.Router.PageView = new App.Views.Page();
   new App.Router().bind('route', function() {
     $('#content').html('');
     App.periodic && clearInterval(App.periodic);
   });
+
   Backbone.history.start({ pushState: true });
 };
 
@@ -43,6 +45,16 @@ App.Router = Backbone.Router.extend({
 });
 
 App.Views = {
+  Page: Backbone.View.extend({
+    el: "body",
+    events: { 'submit form': 'lookupGist' },
+    lookupGist: function(e) {
+      Backbone.history.navigate('gist/' + this.$('input').val(), true);
+      this.$('input').val('');
+      return false;
+    },
+  }),
+
   List: Backbone.View.extend({
     tagName: "ul",
 
