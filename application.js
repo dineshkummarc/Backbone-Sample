@@ -14,6 +14,12 @@ App.Router = Backbone.Router.extend({
   },
 
   index: function() {
+    new Gists().fetch({
+      success: function(collection) {
+        new App.Views.List({ collection: collection }).render();
+      },
+      
+    });
   },
 
   new: function() {
@@ -23,4 +29,38 @@ App.Router = Backbone.Router.extend({
   }
 });
 
+App.Views = {
+  List: Backbone.View.extend({
+    tagName: "ul",
 
+    render: function() {
+      var el = this.el;
+      $('#content').html(el);
+
+      this.collection.forEach(function(item) {
+        $(el).append((new App.Views.GistSummary({ model: item })).render());
+      });
+
+      return this.el;
+    }
+  }),
+  GistSummary: Backbone.View.extend({
+    tagName: "li",
+
+    render: function() {
+      $(this.el).html(Milk.render('<a href="/gist/{{id}}">{{description}}</a>', this.model));
+      return this.el;
+    },
+  }),
+};
+
+Gist = Backbone.Model.extend({
+  description: function() {
+    return this.get('description') || 'Gist #' + this.id;
+  }
+});
+
+Gists = Backbone.Collection.extend({
+  url: 'https://api.github.com/gists',
+  model: Gist,
+});
