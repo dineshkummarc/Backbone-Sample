@@ -1,5 +1,5 @@
 App = function() {
-  new App.Router();
+  new App.Router().bind('route', function() { App.periodic && clearInterval(App.periodic) });
   Backbone.history.start({ pushState: true });
 };
 
@@ -18,14 +18,13 @@ App.Router = Backbone.Router.extend({
       success: function(collection) {
         new App.Views.List({ collection: collection }).render();
       },
-      
     });
   },
 
   // new: function() {
   // },
 
-  show: function() {
+  show: function(id) {
   }
 });
 
@@ -33,9 +32,17 @@ App.Views = {
   List: Backbone.View.extend({
     tagName: "ul",
 
+    initialize: function(options) {
+      $('#content').html(this.el);
+      this.collection.bind('reset', this.render, this);
+
+      App.periodic = function() { options.collection.fetch() };
+      setInterval(App.periodic, 5000);
+    },
+
     render: function() {
       var el = this.el;
-      $('#content').html(el);
+      $(el).html('');
 
       this.collection.forEach(function(item) {
         $(el).append((new App.Views.GistSummary({ model: item })).render());
@@ -47,6 +54,10 @@ App.Views = {
 
   GistSummary: Backbone.View.extend({
     tagName: "li",
+
+    initialize: function() {
+      this.model.bind('change', this.render);
+    },
 
     render: function() {
       $(this.el).html(Milk.render('<a href="/gist/{{id}}">{{description}}</a>', this.model));
