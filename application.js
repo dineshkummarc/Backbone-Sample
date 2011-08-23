@@ -6,7 +6,7 @@ App = function() {
 App.Router = Backbone.Router.extend({
   routes: {
     "":         "index",
-    "gist/new": "new",
+    // "gist/new": "new",
     "gist/:id": "show",
   },
 
@@ -22,8 +22,8 @@ App.Router = Backbone.Router.extend({
     });
   },
 
-  new: function() {
-  },
+  // new: function() {
+  // },
 
   show: function() {
   }
@@ -44,6 +44,7 @@ App.Views = {
       return this.el;
     }
   }),
+
   GistSummary: Backbone.View.extend({
     tagName: "li",
 
@@ -57,7 +58,7 @@ App.Views = {
 Gist = Backbone.Model.extend({
   description: function() {
     return this.get('description') || 'Gist #' + this.id;
-  }
+  },
 });
 
 Gists = Backbone.Collection.extend({
