@@ -21,7 +21,7 @@ App.Router = Backbone.Router.extend({
     view.collection = new Gists();
     view.collection.bind('reset', view.render, view);
     view.collection.fetch();
-    $('#content').html($(view.el).html(''));
+    $('#content').html(view.el);
 
     App.periodic = function() { view.collection.fetch() };
     setInterval(App.periodic, 5000);
@@ -48,6 +48,7 @@ App.Views = {
 
     render: function() {
       var el = this.el;
+      $(el).empty();
 
       this.collection.forEach(function(item) {
         $(el).append((new App.Views.GistSummary({ model: item })).render());
