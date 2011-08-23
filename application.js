@@ -1,5 +1,8 @@
 App = function() {
-  new App.Router().bind('route', function() { App.periodic && clearInterval(App.periodic) });
+  new App.Router().bind('route', function() {
+    $('#content').html('');
+    App.periodic && clearInterval(App.periodic);
+  });
   Backbone.history.start({ pushState: true });
 };
 
@@ -14,22 +17,28 @@ App.Router = Backbone.Router.extend({
   },
 
   index: function() {
-    new Gists().fetch({
-      success: function(collection) {
-        new App.Views.List({ collection: collection }).render();
-      },
-    });
+    var view = new App.Views.List();
+    view.collection = new Gists();
+    view.collection.bind('reset', view.render, view);
+    view.collection.fetch();
+    $('#content').html($(view.el).html(''));
+
+    App.periodic = function() { view.collection.fetch() };
+    setInterval(App.periodic, 5000);
   },
 
   // new: function() {
   // },
 
   show: function(id) {
-    new Gist({ id: id }).fetch({
-      success: function(model) {
-        new App.Views.Gist({ model: model }).render();
-      },
-    });
+    var view = new App.Views.Gist();
+    view.model = new Gist({ id: id });
+    view.model.bind('change', view.render, view);
+    view.model.fetch();
+    $('#content').html(view.el);
+
+    App.periodic = function() { view.model.fetch() };
+    setInterval(App.periodic, 5000);
   },
 });
 
@@ -37,17 +46,8 @@ App.Views = {
   List: Backbone.View.extend({
     tagName: "ul",
 
-    initialize: function(options) {
-      $('#content').html(this.el);
-      this.collection.bind('reset', this.render, this);
-
-      App.periodic = function() { options.collection.fetch() };
-      setInterval(App.periodic, 5000);
-    },
-
     render: function() {
       var el = this.el;
-      $(el).html('');
 
       this.collection.forEach(function(item) {
         $(el).append((new App.Views.GistSummary({ model: item })).render());
@@ -67,12 +67,9 @@ App.Views = {
   }),
 
   Gist: Backbone.View.extend({
-    initialize: function(options) {
-      $('#content').html(this.el);
-    },
-
     render: function() {
       var el = this.el;
+
       $(el).html(Milk.render($('#gist-template').html(), this.model));
 
       _.values(this.model.get('files')).forEach(function(file) {

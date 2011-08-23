@@ -7,6 +7,12 @@
       .search { float: right }
       .search input { width: 25em }
       #content { margin-top: 1em }
+      #content :empty:after {
+        display: block;
+        text-align: center;
+        margin-top: 6em;
+        content: 'Loading...';
+      }
       #content h1 {
         width: 75%;
       }
@@ -29,8 +35,7 @@
       <!-- <h4>
         <a href="/new">Create New</a>
       </h4> -->
-      <div id="content">
-      </div>
+      <div id="content"></div>
     </div>
     <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
