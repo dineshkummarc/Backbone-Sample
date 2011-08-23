@@ -4,7 +4,8 @@
     <title>Backbone</title>
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-1.1.0.min.css" />
     <style>
-      .search { float: right }
+      .search { float: right; margin-top: -2em }
+      .alert-message { margin-top: 1em }
       .search input { width: 25em }
       #content { margin-top: 1em }
       #content :empty:after {
@@ -25,13 +26,15 @@
   </head>
   <body>
     <div class="container">
-      <h2>
-        <a href="/">Backbone Gist Viewer</a>
-      </h2>
-      <form class="search">
-        <input type="search" placeholder="Lookup Gist..." value="" />
-      </form>
-      <small>Testing Backbone</small>
+      <div>
+        <h2>
+          <a href="/">Backbone Gist Viewer</a>
+        </h2>
+        <form class="search">
+          <input type="search" placeholder="Lookup Gist..." value="" />
+        </form>
+        <small>Testing Backbone</small>
+      </div>
       <!-- <h4>
         <a href="/new">Create New</a>
       </h4> -->

@@ -38,7 +38,14 @@ App.Router = Backbone.Router.extend({
     $('#content').html(view.el);
 
     view.model.id = id;
-    view.model.fetch();
+    view.model.fetch({
+      error: function() {
+        var tmpl = '<div class="alert-message error clear">{{.}}</div>';
+        var err = $(Milk.render(tmpl, 'Could not load Gist "' + id + '"'));
+        err.hide().insertBefore($('#content')).slideDown().delay(3000).slideUp();
+        Backbone.history.navigate('', true);
+      },
+    });
   },
 });
 
